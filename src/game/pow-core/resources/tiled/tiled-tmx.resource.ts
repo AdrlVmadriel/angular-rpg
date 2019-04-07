@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-import {errors} from '../../errors';
+import { errors } from '../../errors';
 import {
   writeITiledObjectBase,
   xml2Str,
@@ -25,32 +25,32 @@ import {
   setElAttribute,
   writeTiledProperties
 } from './tiled';
-import {XMLResource} from '../xml.resource';
-import {Resource} from '../../resource';
-import {TiledTSXResource} from './tiled-tsx.resource';
+import { XMLResource } from '../xml.resource';
+import { Resource } from '../../resource';
+import { TiledTSXResource } from './tiled-tsx.resource';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import 'jquery';
-import {ITiledObject, ITileSetDependency, ITiledLayer} from './tiled.model';
+import { ITiledObject, ITileSetDependency, ITiledLayer } from './tiled.model';
 
 /**
  * Use jQuery to load a TMX $map file from a URL.
  */
 export class TiledTMXResource extends XMLResource {
   $map: any; // The <map> element
-  width: number = 0;
-  height: number = 0;
-  orientation: string = 'orthogonal';
-  tileheight: number = 16;
-  tilewidth: number = 16;
-  version: number = 1;
+  width = 0;
+  height = 0;
+  orientation = 'orthogonal';
+  tileheight = 16;
+  tilewidth = 16;
+  version = 1;
   properties: any = {};
   tilesets: any = {};
   layers: ITiledLayer[] = [];
-  xmlHeader: string = '<?xml version="1.0" encoding="UTF-8"?>';
+  xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
 
   write(): any {
-    let root: any = $('<map/>');
+    const root: any = $('<map/>');
     setElAttribute(root, 'version', this.version);
     setElAttribute(root, 'orientation', this.orientation);
     setElAttribute(root, 'width', this.width);
@@ -89,8 +89,7 @@ export class TiledTMXResource extends XMLResource {
         dataElement.attr('encoding', 'csv');
         dataElement.text(layer.data.join(','));
         layerElement.append(dataElement);
-      }
-      else if (typeof layer.objects !== 'undefined') {
+      } else if (typeof layer.objects !== 'undefined') {
         layerElement = $('<objectgroup/>');
         _.each(layer.objects, (obj: ITiledObject) => {
           const objectElement = $('<object/>');
@@ -98,8 +97,7 @@ export class TiledTMXResource extends XMLResource {
           writeTiledProperties(objectElement, obj.properties);
           layerElement.append(objectElement);
         });
-      }
-      else {
+      } else {
         throw new Error(errors.INVALID_ITEM);
       }
       writeITiledLayerBase(layerElement, layer);
@@ -108,7 +106,7 @@ export class TiledTMXResource extends XMLResource {
     return this.xmlHeader + xml2Str(root[0]);
   }
 
-  load(data?: any): Promise<Resource> {
+  load(data?: any): Promise<TiledTMXResource> {
     this.data = data || this.data;
     return new Promise<TiledTMXResource>((resolve, reject) => {
       this.$map = this.getRootNode('map');
@@ -116,26 +114,34 @@ export class TiledTMXResource extends XMLResource {
       this.width = parseInt(this.getElAttribute(this.$map, 'width'), 10);
       this.height = parseInt(this.getElAttribute(this.$map, 'height'), 10);
       this.orientation = this.getElAttribute(this.$map, 'orientation');
-      this.tileheight = parseInt(this.getElAttribute(this.$map, 'tileheight'), 10);
-      this.tilewidth = parseInt(this.getElAttribute(this.$map, 'tilewidth'), 10);
+      this.tileheight = parseInt(
+        this.getElAttribute(this.$map, 'tileheight'),
+        10
+      );
+      this.tilewidth = parseInt(
+        this.getElAttribute(this.$map, 'tilewidth'),
+        10
+      );
       this.properties = readTiledProperties(this.$map);
       const tileSetDeps: ITileSetDependency[] = [];
       const tileSets = this.getChildren(this.$map, 'tileset');
-      const relativePath: string = this.url.substr(0, this.url.lastIndexOf('/') + 1);
-      _.each(tileSets, (ts) => {
+      const relativePath: string = this.url.substr(
+        0,
+        this.url.lastIndexOf('/') + 1
+      );
+      _.each(tileSets, ts => {
         const source: string = this.getElAttribute(ts, 'source');
-        const firstGid: number = parseInt(this.getElAttribute(ts, 'firstgid') || '-1', 10);
+        const firstGid: number = parseInt(
+          this.getElAttribute(ts, 'firstgid') || '-1',
+          10
+        );
         if (source) {
           tileSetDeps.push({
             source: compactUrl(relativePath, source),
             literal: source,
             firstgid: firstGid
           });
-        }
-        // Tileset element is inline, load from the existing XML and
-        // assign the source (used for relative image loading) to be
-        // the .tmx file.
-        else {
+        } else {
           tileSetDeps.push({
             data: ts,
             source: relativePath,
@@ -146,8 +152,8 @@ export class TiledTMXResource extends XMLResource {
 
       // Extract tile <layer>s and <objectgroup>s
       const layers = this.getChildren(this.$map, 'layer,objectgroup');
-      let failed: boolean = false;
-      _.each(layers, (layer) => {
+      let failed = false;
+      _.each(layers, layer => {
         if (failed) {
           return;
         }
@@ -160,7 +166,11 @@ export class TiledTMXResource extends XMLResource {
           const encoding: string = this.getElAttribute(layerData, 'encoding');
           if (!encoding || encoding.toLowerCase() !== 'csv') {
             failed = true;
-            return reject(`pow-core only supports CSV maps. Edit the Map Properties (for:${this.url}) to use the CSV`);
+            return reject(
+              `pow-core only supports CSV maps. Edit the Map Properties (for:${
+                this.url
+              }) to use the CSV`
+            );
           }
           tileLayer.data = JSON.parse('[' + $.trim(layerData.text()) + ']');
         }
@@ -175,7 +185,7 @@ export class TiledTMXResource extends XMLResource {
         const objects = this.getChildren(layer, 'object');
         if (objects) {
           tileLayer.objects = [];
-          _.each(objects, (object) => {
+          _.each(objects, object => {
             tileLayer.objects.push(readITiledObject(object));
           });
         }
@@ -201,9 +211,8 @@ export class TiledTMXResource extends XMLResource {
               this.tilesets[resource.name] = resource;
               _next();
             })
-            .catch((e) => reject(e));
-        }
-        else if (dep.source) {
+            .catch(e => reject(e));
+        } else if (dep.source) {
           new TiledTSXResource()
             .fetch(dep.source)
             .then((resource: TiledTSXResource) => {
@@ -212,9 +221,8 @@ export class TiledTMXResource extends XMLResource {
               resource.literal = dep.literal;
               _next();
             })
-            .catch((e) => reject(e));
-        }
-        else {
+            .catch(e => reject(e));
+        } else {
           reject('Unknown type of tile set data');
         }
       };

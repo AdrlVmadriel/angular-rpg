@@ -13,11 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-import {TickedBehavior} from '../../../../game/pow2/scene/behaviors/ticked-behavior';
-import {TileObject} from '../../../../game/pow2/tile/tile-object';
-import {Animator} from '../../../../game/pow2/core/animator';
-import {Component} from '@angular/core';
-import {Subscription} from 'rxjs/Subscription';
+import { TickedBehavior } from '../../../../game/pow2/scene/behaviors/ticked-behavior';
+import { TileObject } from '../../../../game/pow2/tile/tile-object';
+import { Animator } from '../../../../game/pow2/core/animator';
+import { Component } from '@angular/core';
+import { Subscription } from 'rxjs';
 export enum MoveFrames {
   LEFT = 10,
   RIGHT = 4,
@@ -41,7 +41,8 @@ export enum Headings {
 @Component({
   selector: 'player-render-behavior',
   template: `
-    <ng-content></ng-content>`
+    <ng-content></ng-content>
+  `
 })
 export class PlayerRenderBehaviorComponent extends TickedBehavior {
   host: TileObject;
@@ -73,7 +74,10 @@ export class PlayerRenderBehaviorComponent extends TickedBehavior {
   }
 
   setHeading(direction: Headings, animating: boolean) {
-    if (!this._animator.sourceAnims || this._sourceAnimsFor !== this.host.icon) {
+    if (
+      !this._animator.sourceAnims ||
+      this._sourceAnimsFor !== this.host.icon
+    ) {
       this._animator.setAnimationSource(this.host.icon);
       this._sourceAnimsFor = this.host.icon;
     }

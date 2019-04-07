@@ -8,28 +8,25 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
-import {GameEntityObject} from '../../../scene/game-entity-object';
-import {CombatPlayerRenderBehaviorComponent} from './behaviors/combat-player-render.behavior';
-import {SceneObjectBehavior} from '../../../../game/pow2/scene/scene-object-behavior';
-import {CombatAttackBehaviorComponent} from './behaviors/actions/combat-attack.behavior';
-import {CombatComponent} from './combat.component';
-import {Entity} from '../../../models/entity/entity.model';
-import {GameTileMap} from '../../../scene/game-tile-map';
-import {CombatEncounterBehaviorComponent} from '../behaviors/combat-encounter.behavior';
-import {PlayerBehaviorComponent} from '../behaviors/player-behavior';
-import {PlayerCameraBehaviorComponent} from '../behaviors/player-camera.behavior';
-import {PlayerMapPathBehaviorComponent} from '../behaviors/player-map-path.behavior';
-import {PlayerRenderBehaviorComponent} from '../behaviors/player-render.behavior';
-import {PlayerTriggerBehaviorComponent} from '../behaviors/player-look.behavior';
-import {Scene} from '../../../../game/pow2/scene/scene';
-import {Point} from '../../../../game/pow-core/point';
-import {ISceneViewRenderer} from '../../../../game/pow2/scene/scene.model';
-import {SceneView} from '../../../../game/pow2/scene/scene-view';
-import {TileObjectRenderer} from '../../../../game/pow2/tile/render/tile-object-renderer';
-import {Rect} from '../../../../game/pow-core/rect';
-import {GameFeatureObject} from '../../../scene/game-feature-object';
-import {TiledFeatureComponent} from './map-feature.component';
-import {BehaviorSubject, Observable} from 'rxjs';
+import { GameEntityObject } from '../../../scene/game-entity-object';
+import { SceneObjectBehavior } from '../../../../game/pow2/scene/scene-object-behavior';
+import { Entity } from '../../../models/entity/entity.model';
+import { GameTileMap } from '../../../scene/game-tile-map';
+import { CombatEncounterBehaviorComponent } from '../behaviors/combat-encounter.behavior';
+import { PlayerBehaviorComponent } from '../behaviors/player-behavior';
+import { PlayerCameraBehaviorComponent } from '../behaviors/player-camera.behavior';
+import { PlayerMapPathBehaviorComponent } from '../behaviors/player-map-path.behavior';
+import { PlayerRenderBehaviorComponent } from '../behaviors/player-render.behavior';
+import { PlayerTriggerBehaviorComponent } from '../behaviors/player-look.behavior';
+import { Scene } from '../../../../game/pow2/scene/scene';
+import { Point } from '../../../../game/pow-core/point';
+import { ISceneViewRenderer } from '../../../../game/pow2/scene/scene.model';
+import { SceneView } from '../../../../game/pow2/scene/scene-view';
+import { TileObjectRenderer } from '../../../../game/pow2/tile/render/tile-object-renderer';
+import { Rect } from '../../../../game/pow-core/rect';
+import { GameFeatureObject } from '../../../scene/game-feature-object';
+import { TiledFeatureComponent } from './map-feature.component';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   selector: 'world-player',
@@ -38,18 +35,29 @@ import {BehaviorSubject, Observable} from 'rxjs';
     <player-render-behavior #render></player-render-behavior>
     <collision-behavior #collision></collision-behavior>
     <player-map-path-behavior [tileMap]="map" #path></player-map-path-behavior>
-    <player-behavior (onCompleteMove)="encounter.completeMove($event)" #player></player-behavior>
-    <combat-encounter-behavior [scene]="scene" #encounter [tileMap]="map" [player]="self"></combat-encounter-behavior>
+    <player-behavior
+      (onCompleteMove)="encounter.completeMove($event)"
+      #player
+    ></player-behavior>
+    <combat-encounter-behavior
+      [scene]="scene"
+      #encounter
+      [tileMap]="map"
+      [player]="self"
+    ></combat-encounter-behavior>
     <player-camera-behavior #camera></player-camera-behavior>
     <player-look-behavior
       (onLook)="onFeatureLook($event)"
       (onLookAway)="onFeatureLookAway($event)"
-      #trigger></player-look-behavior>
+      #trigger
+    ></player-look-behavior>
     <ng-content></ng-content>
   `
 })
-export class WorldPlayerComponent extends GameEntityObject implements AfterViewInit, OnDestroy, ISceneViewRenderer {
-  @ViewChildren('render,collision,path,player,trigger,camera,encounter') behaviors: QueryList<SceneObjectBehavior>;
+export class WorldPlayerComponent extends GameEntityObject
+  implements AfterViewInit, OnDestroy, ISceneViewRenderer {
+  @ViewChildren('render,collision,path,player,trigger,camera,encounter')
+  behaviors: QueryList<SceneObjectBehavior>;
   @Input() icon: string;
   @Input() model: Entity;
   @Input() scene: Scene;
@@ -86,7 +94,9 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
 
   /** The player has touched a game feature. */
   onFeatureLook(event: GameFeatureObject) {
-    const feature = event.findBehavior(TiledFeatureComponent) as TiledFeatureComponent;
+    const feature = event.findBehavior(
+      TiledFeatureComponent
+    ) as TiledFeatureComponent;
     if (feature) {
       feature.enter(this);
       this.feature = feature;
@@ -95,7 +105,9 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
 
   /** The player was touching a game feature, and is now leaving. */
   onFeatureLookAway(event: GameFeatureObject) {
-    const feature = event.findBehavior(TiledFeatureComponent) as TiledFeatureComponent;
+    const feature = event.findBehavior(
+      TiledFeatureComponent
+    ) as TiledFeatureComponent;
     if (feature) {
       feature.exit(this);
       this.feature = null;
@@ -104,7 +116,8 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
 
   private _featureComponent$ = new BehaviorSubject<TiledFeatureComponent>(null);
 
-  featureComponent$: Observable<TiledFeatureComponent> = this._featureComponent$;
+  featureComponent$: Observable<TiledFeatureComponent> = this
+    ._featureComponent$;
 
   get feature(): TiledFeatureComponent {
     return this._featureComponent$.value;
@@ -134,7 +147,12 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
    */
   renderFrame(view: SceneView, elapsed: number) {
     // Render self
-    this.objectRenderer.render(this, this.renderPoint || this.point, view, this.meta);
+    this.objectRenderer.render(
+      this,
+      this.renderPoint || this.point,
+      view,
+      this.meta
+    );
 
     // Any path target
     if (this.movable) {
@@ -145,12 +163,24 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
         destination.x -= 0.5;
         destination.y -= 0.5;
 
-        const screenTile: Rect = view.worldToScreen(new Rect(destination, new Point(1, 1)));
+        const screenTile: Rect = view.worldToScreen(
+          new Rect(destination, new Point(1, 1))
+        );
         view.context.fillStyle = this.targetFill;
-        view.context.fillRect(screenTile.point.x, screenTile.point.y, screenTile.extent.x, screenTile.extent.y);
+        view.context.fillRect(
+          screenTile.point.x,
+          screenTile.point.y,
+          screenTile.extent.x,
+          screenTile.extent.y
+        );
         view.context.strokeStyle = this.targetStroke;
         view.context.lineWidth = this.targetStrokeWidth;
-        view.context.strokeRect(screenTile.point.x, screenTile.point.y, screenTile.extent.x, screenTile.extent.y);
+        view.context.strokeRect(
+          screenTile.point.x,
+          screenTile.point.y,
+          screenTile.extent.x,
+          screenTile.extent.y
+        );
 
         view.context.restore();
       }
@@ -160,7 +190,6 @@ export class WorldPlayerComponent extends GameEntityObject implements AfterViewI
   afterFrame(view: SceneView, elapsed: number) {
     // Nope
   }
-
 }
 
 /** Components associated with world player */

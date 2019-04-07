@@ -1,15 +1,13 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {RPGGame} from '../../services/index';
-import {HeroModel} from '../../../game/rpg/models/all';
-import {Observable} from 'rxjs/Observable';
-import {Entity, EntityWithEquipment} from '../../models/entity/entity.model';
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {getEntityEquipment} from '../../models/selectors';
-import {AppState} from '../../app.model';
-import {Store} from '@ngrx/store';
-import {CombatService} from '../../models/combat/combat.service';
-import {getXPForLevel} from '../../models/levels';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { RPGGame } from '../../services/index';
+import { Entity, EntityWithEquipment } from '../../models/entity/entity.model';
+import { getEntityEquipment } from '../../models/selectors';
+import { AppState } from '../../app.model';
+import { Store } from '@ngrx/store';
+import { CombatService } from '../../models/combat/combat.service';
+import { getXPForLevel } from '../../models/levels';
+import { Subject, BehaviorSubject, Observable, empty, EMPTY } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'player-stats',
@@ -17,8 +15,9 @@ import {getXPForLevel} from '../../models/levels';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayerStatsComponent {
-
-  private _showExperience$: Subject<boolean> = new BehaviorSubject<boolean>(true);
+  private _showExperience$: Subject<boolean> = new BehaviorSubject<boolean>(
+    true
+  );
   showExperience$: Observable<boolean> = this._showExperience$;
 
   /**
@@ -63,9 +62,11 @@ export class PlayerStatsComponent {
    * Resolve any entity equipment IDs to their equipment objects. This gives
    * access to the stats for calculating things like total attack or defense.
    */
-  entityWithEquipment$ = this.model$.switchMap((entity: Entity) => {
-    return entity ? this.store.select(getEntityEquipment(entity.eid)) : Observable.empty();
-  });
+  entityWithEquipment$ = this.model$.pipe(
+    switchMap((entity: Entity) => {
+      return entity ? this.store.select(getEntityEquipment(entity.eid)) : EMPTY;
+    })
+  );
 
   /**
    * Hide/show combat stats attack/defense/speed/magic
@@ -74,66 +75,85 @@ export class PlayerStatsComponent {
     this._showCombatStats$.next(value);
   }
 
-  private _showCombatStats$: Subject<boolean> = new BehaviorSubject<boolean>(true);
+  private _showCombatStats$: Subject<boolean> = new BehaviorSubject<boolean>(
+    true
+  );
   showCombatStats$: Observable<boolean> = this._showCombatStats$;
 
   /**
    * Total attack strength including weapons
    */
-  attack$: Observable<number> = this.entityWithEquipment$.map((equipped: EntityWithEquipment) => {
-    return this.combatService.getAttack(equipped);
-  });
+  attack$: Observable<number> = this.entityWithEquipment$.pipe(
+    map((equipped: EntityWithEquipment) => {
+      return this.combatService.getAttack(equipped);
+    })
+  );
   /**
    * Total defense including armor and accessories
    */
-  defense$: Observable<number> = this.entityWithEquipment$.map((equipped: EntityWithEquipment) => {
-    return this.combatService.getDefense(equipped);
-  });
+  defense$: Observable<number> = this.entityWithEquipment$.pipe(
+    map((equipped: EntityWithEquipment) => {
+      return this.combatService.getDefense(equipped);
+    })
+  );
   /**
    * Total speed
    */
-  speed$: Observable<number> = this.entityWithEquipment$.map((equipped: EntityWithEquipment) => {
-    return this.combatService.getSpeed(equipped);
-  });
+  speed$: Observable<number> = this.entityWithEquipment$.pipe(
+    map((equipped: EntityWithEquipment) => {
+      return this.combatService.getSpeed(equipped);
+    })
+  );
   /**
    * Total magic power
    */
-  magic$: Observable<number> = this.entityWithEquipment$.map((equipped: EntityWithEquipment) => {
-    return this.combatService.getMagic(equipped);
-  });
+  magic$: Observable<number> = this.entityWithEquipment$.pipe(
+    map((equipped: EntityWithEquipment) => {
+      return this.combatService.getMagic(equipped);
+    })
+  );
 
   /**
    * The amount of experience needed to progress to the next level.
    */
-  nextLevelExp$: Observable<number> = this.model$.map((entity: Entity) => {
-    return entity ? getXPForLevel(entity.level + 1) : 0;
-  });
+  nextLevelExp$: Observable<number> = this.model$.pipe(
+    map((entity: Entity) => {
+      return entity ? getXPForLevel(entity.level + 1) : 0;
+    })
+  );
 
   /**
    * Percentage of experience gathered toward progressing to the next level.
    */
-  nextLevelPercentage$: Observable<number> = this.model$.map((entity: Entity) => {
-    if (!entity) {
-      return 0;
-    }
-    const nextLevelExp: number = getXPForLevel(entity.level + 1);
-    const currentLevelExp: number = getXPForLevel(entity.level);
-    let width = 0;
-    if (entity) {
-      width = (entity.exp - currentLevelExp) / (nextLevelExp - currentLevelExp) * 100;
-    }
-    return Math.round(width);
-  });
+  nextLevelPercentage$: Observable<number> = this.model$.pipe(
+    map((entity: Entity) => {
+      if (!entity) {
+        return 0;
+      }
+      const nextLevelExp: number = getXPForLevel(entity.level + 1);
+      const currentLevelExp: number = getXPForLevel(entity.level);
+      let width = 0;
+      if (entity) {
+        width =
+          ((entity.exp - currentLevelExp) / (nextLevelExp - currentLevelExp)) *
+          100;
+      }
+      return Math.round(width);
+    })
+  );
 
   /**
    * Percentage of health that this player has remaining (0-100)
    */
-  healthPercentage$: Observable<number> = this.model$.map((entity: Entity) => {
-    return entity ? Math.round(entity.hp / entity.maxhp * 100) : 0;
-  });
+  healthPercentage$: Observable<number> = this.model$.pipe(
+    map((entity: Entity) => {
+      return entity ? Math.round((entity.hp / entity.maxhp) * 100) : 0;
+    })
+  );
 
-  constructor(public game: RPGGame,
-              public combatService: CombatService,
-              public store: Store<AppState>) {
-  }
+  constructor(
+    public game: RPGGame,
+    public combatService: CombatService,
+    public store: Store<AppState>
+  ) {}
 }

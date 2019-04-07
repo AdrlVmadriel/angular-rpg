@@ -12,7 +12,7 @@ import {
 import {SpritesEffects} from './sprites.effects';
 import {SpritesService} from './sprites.service';
 import {SpritesLoadAction, SpritesLoadSuccessAction} from './sprites.actions';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 describe('Sprites', () => {
 

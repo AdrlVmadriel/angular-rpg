@@ -37,9 +37,9 @@ export function spritesReducer(state: SpritesStateRecord = spritesStateFactory()
   switch (action.type) {
     case SpritesRegisterAction.typeId: {
       const map = Immutable.Map<string, SpriteData>(action.payload);
-      map.forEach((value, key) => {
-        assertTrue(!state.spritesById.has(key), `duplicates are not allowed. sprite (${key}) is already declared`);
-      });
+      // map.forEach((value, key) => {
+      //   assertTrue(!state.spritesById.has(key), `duplicates are not allowed. sprite (${key}) is already declared`);
+      // });
       return state.updateIn(['spritesById'], (s) => s.merge(action.payload));
     }
     case SpritesLoadSuccessAction.typeId: {

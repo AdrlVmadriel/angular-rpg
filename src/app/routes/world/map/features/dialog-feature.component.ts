@@ -1,7 +1,18 @@
-import {TiledFeatureComponent, TiledMapFeatureData} from '../map-feature.component';
-import {Component, Input, ViewEncapsulation, ChangeDetectionStrategy, EventEmitter, Output} from '@angular/core';
-import {Observable} from 'rxjs';
-import {IScene} from '../../../../../game/pow2/scene/scene.model';
+import {
+  TiledFeatureComponent,
+  TiledMapFeatureData
+} from '../map-feature.component';
+import {
+  Component,
+  Input,
+  ViewEncapsulation,
+  ChangeDetectionStrategy,
+  EventEmitter,
+  Output
+} from '@angular/core';
+import { Observable } from 'rxjs';
+import { IScene } from '../../../../../game/pow2/scene/scene.model';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'dialog-feature',
@@ -18,18 +29,23 @@ export class DialogFeatureComponent extends TiledFeatureComponent {
   active$: Observable<boolean>;
 
   /** The dialog text */
-  text$: Observable<string> = this.feature$.map((f: TiledMapFeatureData) => {
-    return f.properties.text;
-  });
+  text$: Observable<string> = this.feature$.pipe(
+    map((f: TiledMapFeatureData) => {
+      return f.properties.text;
+    })
+  );
 
   /** The dialog title */
-  title$: Observable<string> = this.feature$.map((f: TiledMapFeatureData) => {
-    return f.properties.title;
-  });
+  title$: Observable<string> = this.feature$.pipe(
+    map((f: TiledMapFeatureData) => {
+      return f.properties.title;
+    })
+  );
 
   /** The icon to display for the dialog speaker */
-  icon$: Observable<string> = this.feature$.map((f: TiledMapFeatureData) => {
-    return f.properties.icon;
-  });
-
+  icon$: Observable<string> = this.feature$.pipe(
+    map((f: TiledMapFeatureData) => {
+      return f.properties.icon;
+    })
+  );
 }

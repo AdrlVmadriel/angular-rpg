@@ -13,29 +13,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-import {ItemModel} from '../../game/rpg/models/itemModel';
-import {GameStateMachine} from '../../game/rpg/states/gameStateMachine';
-import {ResourceManager} from '../../game/pow-core/resource-manager';
-import {Injectable} from '@angular/core';
-import {Store} from '@ngrx/store';
-import {GameStateLoadAction, GameStateNewAction, GameStateTravelAction} from '../models/game-state/game-state.actions';
-import {AppState} from '../app.model';
-import {GameState} from '../models/game-state/game-state.model';
+import { ResourceManager } from '../../game/pow-core/resource-manager';
+import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import {
+  GameStateLoadAction,
+  GameStateNewAction,
+  GameStateTravelAction
+} from '../models/game-state/game-state.actions';
+import { AppState } from '../app.model';
+import { GameState } from '../models/game-state/game-state.model';
 import * as _ from 'underscore';
-import {Entity, EntityType} from '../models/entity/entity.model';
-import {EntityAddBeingAction} from '../models/entity/entity.actions';
-import {GameStateService} from '../models/game-state/game-state.service';
+import { Entity, EntityType } from '../models/entity/entity.model';
+import { EntityAddBeingAction } from '../models/entity/entity.actions';
+import { GameStateService } from '../models/game-state/game-state.service';
 
 import * as Immutable from 'immutable';
 
 @Injectable()
 export class RPGGame {
-  constructor(public loader: ResourceManager,
-              private store: Store<AppState>) {
-  }
+  constructor(public loader: ResourceManager, private store: Store<AppState>) {}
 
   static getHPForLevel(level: number, model: Entity): number {
-    return Math.floor(model.basedefense * Math.pow(level, 1.1)) + (model.basedefense * 2);
+    return (
+      Math.floor(model.basedefense * Math.pow(level, 1.1)) +
+      model.basedefense * 2
+    );
   }
 
   static create(type: EntityType, name: string) {
@@ -79,7 +82,7 @@ export class RPGGame {
           baseattack: 3,
           basespeed: 10,
           basemagic: 2,
-          basedefense: 5,
+          basedefense: 5
         });
         break;
       case 'mage':
@@ -89,7 +92,7 @@ export class RPGGame {
           baseattack: 2,
           basespeed: 10,
           basemagic: 4,
-          basedefense: 4,
+          basedefense: 4
         });
         break;
       default:
@@ -102,7 +105,7 @@ export class RPGGame {
       defense: character.basedefense,
       speed: character.basespeed,
       attack: character.baseattack,
-      magic: character.basemagic,
+      magic: character.basemagic
     });
     return character;
   }
@@ -111,14 +114,15 @@ export class RPGGame {
    * Initialize the game and resolve a promise that indicates whether the game
    * is new or was loaded from save data.  Resolves with true if the game is new.
    */
-  initGame(load: boolean = !!localStorage.getItem(GameStateService.STATE_KEY)): Promise<boolean> {
+  initGame(
+    load: boolean = !!localStorage.getItem(GameStateService.STATE_KEY)
+  ): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (load) {
         // Set the root game state
         this.store.dispatch(new GameStateLoadAction());
         resolve(false);
-      }
-      else {
+      } else {
         const warrior = RPGGame.create('warrior', 'Warrior');
         const ranger = RPGGame.create('ranger', 'Ranger');
         const healer = RPGGame.create('healer', 'Mage');
@@ -130,9 +134,9 @@ export class RPGGame {
           gold: 200,
           combatZone: '',
           location: 'town',
-          position: {x: 12, y: 8},
+          position: { x: 12, y: 8 },
           boardedShip: false,
-          shipPosition: {x: 0, y: 0}
+          shipPosition: { x: 0, y: 0 }
         };
         this.store.dispatch(new GameStateNewAction(initialState));
         this.store.dispatch(new EntityAddBeingAction(warrior));
@@ -143,5 +147,4 @@ export class RPGGame {
       }
     });
   }
-
 }

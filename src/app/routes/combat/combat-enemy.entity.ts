@@ -1,24 +1,37 @@
-import {AfterViewInit, Component, forwardRef, Inject, Input, OnDestroy, ViewChild} from '@angular/core';
-import {GameEntityObject} from '../../scene/game-entity-object';
-import {CombatComponent} from './combat.component';
-import {Combatant} from '../../models/combat/combat.model';
-import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {CombatAttackBehaviorComponent} from './behaviors/actions/combat-attack.behavior';
-import {SpriteRenderBehaviorComponent} from '../../behaviors/sprite-render.behavior';
+import {
+  AfterViewInit,
+  Component,
+  forwardRef,
+  Inject,
+  Input,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
+import { GameEntityObject } from '../../scene/game-entity-object';
+import { CombatComponent } from './combat.component';
+import { Combatant } from '../../models/combat/combat.model';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { CombatAttackBehaviorComponent } from './behaviors/actions/combat-attack.behavior';
+import { SpriteRenderBehaviorComponent } from '../../behaviors/sprite-render.behavior';
+import { distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'combat-enemy',
   template: `
-    <sprite-render-behavior [icon]="(model$ | async)?.icon"></sprite-render-behavior>
+    <sprite-render-behavior
+      [icon]="(model$ | async)?.icon"
+    ></sprite-render-behavior>
     <combat-attack-behavior [combat]="combat" #attack></combat-attack-behavior>
     <ng-content></ng-content>
   `
 })
-export class CombatEnemyComponent extends GameEntityObject implements AfterViewInit, OnDestroy {
+export class CombatEnemyComponent extends GameEntityObject
+  implements AfterViewInit, OnDestroy {
+  @ViewChild(CombatAttackBehaviorComponent)
+  attack: CombatAttackBehaviorComponent;
 
-  @ViewChild(CombatAttackBehaviorComponent) attack: CombatAttackBehaviorComponent;
-
-  @ViewChild(SpriteRenderBehaviorComponent) render: SpriteRenderBehaviorComponent;
+  @ViewChild(SpriteRenderBehaviorComponent)
+  render: SpriteRenderBehaviorComponent;
   private _model$ = new BehaviorSubject<Combatant>(null);
 
   model$: Observable<Combatant> = this._model$;
@@ -35,7 +48,9 @@ export class CombatEnemyComponent extends GameEntityObject implements AfterViewI
 
   private _spriteSubscription: Subscription;
 
-  constructor(@Inject(forwardRef(() => CombatComponent)) public combat: CombatComponent) {
+  constructor(
+    @Inject(forwardRef(() => CombatComponent)) public combat: CombatComponent
+  ) {
     super();
   }
 
@@ -47,9 +62,14 @@ export class CombatEnemyComponent extends GameEntityObject implements AfterViewI
     this.combat.scene.addObject(this);
     this.addBehavior(this.render);
     this.addBehavior(this.attack);
-    this._spriteSubscription = this.model$.distinctUntilChanged().do((m: Combatant) => {
-      this.setSprite(m ? m.icon : null);
-    }).subscribe();
+    this._spriteSubscription = this.model$
+      .pipe(
+        distinctUntilChanged(),
+        tap((m: Combatant) => {
+          this.setSprite(m ? m.icon : null);
+        })
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
@@ -59,10 +79,7 @@ export class CombatEnemyComponent extends GameEntityObject implements AfterViewI
     this._spriteSubscription.unsubscribe();
     this.destroy();
   }
-
 }
 
 /** Components associated with combat enemy */
-export const COMBAT_ENEMY_COMPONENTS = [
-  CombatEnemyComponent
-];
+export const COMBAT_ENEMY_COMPONENTS = [CombatEnemyComponent];

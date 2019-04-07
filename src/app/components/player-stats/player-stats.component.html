@@ -2,12 +2,12 @@
 
 <section *ngIf="showHP$ | async">
   <div>HP {{(model$ | async)?.hp}} / {{(model$ | async)?.maxhp}}</div>
-  <md-progress-bar [value]="healthPercentage$ | async"></md-progress-bar>
+  <mat-progress-bar [value]="healthPercentage$ | async"></mat-progress-bar>
 </section>
 
 <section *ngIf="showExperience$ | async">
   <div>EXP {{(model$ | async)?.exp}} / {{nextLevelExp$ | async}}</div>
-  <md-progress-bar [value]="nextLevelPercentage$ | async"></md-progress-bar>
+  <mat-progress-bar [value]="nextLevelPercentage$ | async"></mat-progress-bar>
 </section>
 
 <section *ngIf="showCombatStats$ | async">

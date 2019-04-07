@@ -1,20 +1,26 @@
 import {
-  CombatActions, CombatAttackAction, CombatEncounterAction, CombatEncounterReadyAction,
-  CombatVictoryAction, CombatVictoryCompleteAction
+  CombatActions,
+  CombatAttackAction,
+  CombatEncounterAction,
+  CombatEncounterReadyAction,
+  CombatVictoryAction,
+  CombatVictoryCompleteAction
 } from './combat.actions';
-import {Combatant, CombatAttack, CombatState} from './combat.model';
+import { Combatant, CombatAttack, CombatState } from './combat.model';
 import * as Immutable from 'immutable';
-import {List} from 'immutable';
-import {assertTrue, exhaustiveCheck, makeRecordFactory} from '../util';
-import {TypedRecord} from 'typed-immutable-record';
-import {Entity} from '../entity/entity.model';
+import { List } from 'immutable';
+import { assertTrue, exhaustiveCheck, makeRecordFactory } from '../util';
+import { TypedRecord } from 'typed-immutable-record';
+import { Entity } from '../entity/entity.model';
 
 /**
  * Combat state record.
- * @private
  * @internal
  */
-interface CombatStateRecord extends TypedRecord<CombatStateRecord>, CombatState {
+interface CombatStateRecord
+  extends TypedRecord<CombatStateRecord>,
+    CombatState {
+  // pass
 }
 
 /**
@@ -23,7 +29,10 @@ interface CombatStateRecord extends TypedRecord<CombatStateRecord>, CombatState 
  * testing.
  * @internal
  */
-export const combatStateFactory = makeRecordFactory<CombatState, CombatStateRecord>({
+export const combatStateFactory = makeRecordFactory<
+  CombatState,
+  CombatStateRecord
+>({
   loading: false,
   enemies: Immutable.List<Combatant>(),
   party: Immutable.List<Entity>(),
@@ -33,7 +42,7 @@ export const combatStateFactory = makeRecordFactory<CombatState, CombatStateReco
   experience: 0,
   items: [],
   zone: '',
-  id: '',
+  id: ''
 });
 
 /**
@@ -44,13 +53,15 @@ export function combatFromJSON(object: CombatState): CombatState {
   const recordValues = {
     ...object,
     enemies: Immutable.List<Combatant>(object.enemies),
-    party: Immutable.List<Entity>(object.party),
+    party: Immutable.List<Entity>(object.party)
   };
   return combatStateFactory(recordValues);
 }
 
-export function combatReducer(state: CombatStateRecord = combatStateFactory(),
-                              action: CombatActions): CombatStateRecord {
+export function combatReducer(
+  state: CombatStateRecord = combatStateFactory(),
+  action: CombatActions
+): CombatStateRecord {
   switch (action.type) {
     case CombatEncounterAction.typeId: {
       return state.merge({
@@ -59,7 +70,7 @@ export function combatReducer(state: CombatStateRecord = combatStateFactory(),
       });
     }
     case CombatEncounterReadyAction.typeId: {
-      return state.merge({loading: true});
+      return state.merge({ loading: true });
     }
     case CombatVictoryAction.typeId: {
       return state;
@@ -102,7 +113,10 @@ export function combatReducer(state: CombatStateRecord = combatStateFactory(),
           });
         });
       }
-      assertTrue(index !== -1, 'attack target found in neither enemies nor party lists');
+      assertTrue(
+        index !== -1,
+        'attack target found in neither enemies nor party lists'
+      );
       return state;
     }
     default:
@@ -114,6 +128,8 @@ export function combatReducer(state: CombatStateRecord = combatStateFactory(),
 /** @internal {@see sliceCombatState} */
 export const sliceCombatLoading = (state: CombatStateRecord) => state.loading;
 /** @internal {@see sliceCombatState} */
-export const sliceCombatEncounterEnemies = (state: CombatStateRecord) => state.enemies;
+export const sliceCombatEncounterEnemies = (state: CombatStateRecord) =>
+  state.enemies;
 /** @internal {@see sliceCombatState} */
-export const sliceCombatEncounterParty = (state: CombatStateRecord) => state.party;
+export const sliceCombatEncounterParty = (state: CombatStateRecord) =>
+  state.party;

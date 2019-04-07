@@ -1,10 +1,13 @@
 import * as Immutable from 'immutable';
-import {storeLogger} from 'ngrx-store-logger';
+import { storeLogger } from 'ngrx-store-logger';
 
 /**
  * Possible types for values that need to be lazily evaluated
  */
-type DeferredValueTypes = Immutable.List<any> | Immutable.Map<string, any> | any;
+type DeferredValueTypes =
+  | Immutable.List<any>
+  | Immutable.Map<string, any>
+  | any;
 
 /**
  * Wrapper class that will serialize the state tree for viewing, but not until you
@@ -25,8 +28,7 @@ class DeferredValue {
       this._lazy = () => {
         return cached || (cached = value.toJS());
       };
-    }
-    else {
+    } else {
       this._lazy = () => value;
     }
   }

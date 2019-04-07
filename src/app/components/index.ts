@@ -23,8 +23,8 @@ import {RPG_PLAYER_CARD_EXPORTS} from './player-card/index';
 import {RPG_PARTY_INVENTORY_EXPORTS} from './party-inventory/index';
 import {RPG_SPRITE_EXPORTS} from './sprite/index';
 import {
-  MdButtonModule, MdButtonToggleModule, MdCardModule, MdIconModule, MdListModule, MdProgressBarModule, MdSidenavModule,
-  MdToolbarModule
+  MatButtonModule, MatButtonToggleModule, MatCardModule, MatIconModule, MatListModule, MatProgressBarModule, MatSidenavModule,
+  MatToolbarModule
 } from '@angular/material';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -65,13 +65,13 @@ export const APP_COMPONENTS_PROVIDERS = [
     BrowserAnimationsModule,
     CommonModule,
     FlexLayoutModule,
-    MdSidenavModule,
-    MdIconModule,
-    MdListModule,
-    MdCardModule,
-    MdProgressBarModule,
-    MdToolbarModule,
-    MdButtonModule
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatToolbarModule,
+    MatButtonModule
   ]
 })
 export class AppComponentsModule {

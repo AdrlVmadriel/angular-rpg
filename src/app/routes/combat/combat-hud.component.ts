@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {Scene} from '../../../game/pow2/scene/scene';
-import {Observable} from 'rxjs/Observable';
 import {getCombatEncounterParty} from '../../models/selectors';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app.model';
@@ -9,6 +8,7 @@ import {ResourceManager} from '../../../game/pow-core/resource-manager';
 import {Entity} from '../../models/entity/entity.model';
 import {GameEntityObject} from '../../scene/game-entity-object';
 import {List} from 'immutable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'combat-hud',

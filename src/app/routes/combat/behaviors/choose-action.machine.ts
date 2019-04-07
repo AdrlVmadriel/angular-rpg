@@ -4,7 +4,6 @@ import {Point} from '../../../../game/pow-core/point';
 import {StateMachine} from '../../../../game/pow2/core/state-machine';
 import {Scene} from '../../../../game/pow2/scene/scene';
 import {CombatActionBehavior} from '../behaviors/combat-action.behavior';
-import {UsableModel} from '../../../../game/rpg/models/usableModel';
 import {GameWorld} from '../../../services/game-world';
 import {State} from '../../../../game/pow2/core/state';
 import {CombatPlayerRenderBehaviorComponent} from '../behaviors/combat-player-render.behavior';

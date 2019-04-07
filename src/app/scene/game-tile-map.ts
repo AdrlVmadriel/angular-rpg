@@ -14,23 +14,21 @@
  limitations under the License.
  */
 import * as _ from 'underscore';
-import {GameFeatureObject} from './game-feature-object';
-import * as rpg from '../../game/rpg/game';
-import {TileMap} from '../../game/pow2/tile/tile-map';
-import {TileObject} from '../../game/pow2/tile/tile-object';
-import {ITiledObject} from '../../game/pow-core/resources/tiled/tiled.model';
-import {Point, IPoint} from '../../game/pow-core/point';
-import {Rect} from '../../game/pow-core/rect';
-import {SceneObjectBehavior} from '../../game/pow2/scene/scene-object-behavior';
-import {SceneObject} from '../../game/pow2/scene/scene-object';
-import {WORLD_MAP_FEATURES} from '../routes/world/map/features/index';
-import {IZoneMatch} from '../models/combat/combat.model';
+import { GameFeatureObject } from './game-feature-object';
+import { TileMap } from '../../game/pow2/tile/tile-map';
+import { TileObject } from '../../game/pow2/tile/tile-object';
+import { ITiledObject } from '../../game/pow-core/resources/tiled/tiled.model';
+import { Point, IPoint } from '../../game/pow-core/point';
+import { Rect } from '../../game/pow-core/rect';
+import { SceneObjectBehavior } from '../../game/pow2/scene/scene-object-behavior';
+import { SceneObject } from '../../game/pow2/scene/scene-object';
+import { WORLD_MAP_FEATURES } from '../routes/world/map/features/index';
+import { IZoneMatch } from '../models/combat/combat.model';
 
 /**
  * A tile map that supports game feature objects and map.
  */
 export class GameTileMap extends TileMap {
-
   musicUrl: string;
 
   loaded() {
@@ -60,7 +58,9 @@ export class GameTileMap extends TileMap {
 
   getEntryPoint(): Point {
     // If no point is specified, use the position of the first Portal on the current map
-    const portal: any = _.where(this.features.objects, {type: 'PortalFeatureComponent'})[0];
+    const portal: any = _.where(this.features.objects, {
+      type: 'PortalFeatureComponent'
+    })[0];
     if (portal) {
       return new Point(portal.x / portal.width, portal.y / portal.height);
     }
@@ -79,7 +79,7 @@ export class GameTileMap extends TileMap {
 
   removeFeaturesFromScene() {
     _.each(this.features.objects, (obj: any) => {
-      const featureObject: SceneObject = <SceneObject> obj._object;
+      const featureObject: SceneObject = <SceneObject>obj._object;
       delete obj._object;
       if (featureObject) {
         featureObject.destroy();
@@ -112,7 +112,9 @@ export class GameTileMap extends TileMap {
     if (tiledObject.type && componentType) {
       const component = new componentType() as SceneObjectBehavior;
       if (!object.addBehavior(component)) {
-        throw new Error(`Component ${component.name} failed to connect to host ${this.name}`);
+        throw new Error(
+          `Component ${component.name} failed to connect to host ${this.name}`
+        );
       }
     }
     return object;
@@ -159,5 +161,4 @@ export class GameTileMap extends TileMap {
   toString() {
     return this.map ? this.map.url : 'no-data';
   }
-
 }

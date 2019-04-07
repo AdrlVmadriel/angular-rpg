@@ -1,42 +1,42 @@
-import {Injectable} from '@angular/core';
-import {Observable, ReplaySubject} from 'rxjs/Rx';
-import {ResourceManager} from '../../../game/pow-core/resource-manager';
-import {CombatantTypes, CombatEncounter} from './combat.model';
-import {getMapUrl} from '../../../game/pow2/core/api';
-import {TiledTMXResource} from '../../../game/pow-core/resources/tiled/tiled-tmx.resource';
-import {BaseEntity} from '../base-entity';
-import {ITiledLayer} from '../../../game/pow-core/resources/tiled/tiled.model';
+import { Injectable } from '@angular/core';
+import { ResourceManager } from '../../../game/pow-core/resource-manager';
+import { CombatantTypes, CombatEncounter } from './combat.model';
+import { getMapUrl } from '../../../game/pow2/core/api';
+import { TiledTMXResource } from '../../../game/pow-core/resources/tiled/tiled-tmx.resource';
+import { BaseEntity } from '../base-entity';
+import { ITiledLayer } from '../../../game/pow-core/resources/tiled/tiled.model';
 import * as _ from 'underscore';
-import {EntityWithEquipment} from '../entity/entity.model';
+import { EntityWithEquipment } from '../entity/entity.model';
+import { ReplaySubject, Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class CombatService {
-
-  constructor(private resourceLoader: ResourceManager) {
-  }
+  constructor(private resourceLoader: ResourceManager) {}
 
   private _combatMap$ = new ReplaySubject<TiledTMXResource>(1);
   combatMap$: Observable<TiledTMXResource> = this._combatMap$;
 
   loadMap(combatZone: string): Observable<TiledTMXResource> {
     const mapUrl = getMapUrl('combat');
-    return Observable.fromPromise(this.resourceLoader.load(mapUrl)
-      .then((maps: TiledTMXResource[]) => {
+    return from(
+      this.resourceLoader.load(mapUrl).then((maps: TiledTMXResource[]) => {
         if (!maps[0] || !maps[0].data) {
           return null;
         }
         const result: TiledTMXResource = maps[0];
         // Hide all layers that don't correspond to the current combat zone
         result.layers.forEach((l: ITiledLayer) => {
-          l.visible = (l.name === combatZone);
+          l.visible = l.name === combatZone;
         });
         this._combatMap$.next(result);
         return result;
-      }));
+      })
+    );
   }
 
   loadEncounter(encounter: CombatEncounter): Observable<CombatEncounter> {
-    return this.loadMap(encounter.zone).map(() => encounter);
+    return this.loadMap(encounter.zone).pipe(map(() => encounter));
   }
 
   //
@@ -47,7 +47,7 @@ export class CombatService {
     return !test || test.hp <= 0;
   }
 
-// Chance to hit = (BASE_CHANCE_TO_HIT + PLAYER_HIT_PERCENT) - EVASION
+  // Chance to hit = (BASE_CHANCE_TO_HIT + PLAYER_HIT_PERCENT) - EVASION
   rollHit(attacker: CombatantTypes, defender: CombatantTypes): boolean {
     const roll: number = _.random(0, 200);
     const attackerEvasion: number = this.getSpeed(attacker);
@@ -96,8 +96,17 @@ export class CombatService {
     const armorDefense = equipped.armor ? equipped.armor.defense : 0;
     const bootsDefense = equipped.boots ? equipped.boots.defense : 0;
     const helmDefense = equipped.helm ? equipped.helm.defense : 0;
-    const accessoryDefense = equipped.accessory ? equipped.accessory.defense : 0;
-    return member.defense + shieldDefense + armorDefense + bootsDefense + helmDefense + accessoryDefense;
+    const accessoryDefense = equipped.accessory
+      ? equipped.accessory.defense
+      : 0;
+    return (
+      member.defense +
+      shieldDefense +
+      armorDefense +
+      bootsDefense +
+      helmDefense +
+      accessoryDefense
+    );
   }
 
   /**
@@ -125,5 +134,4 @@ export class CombatService {
     const min = amount * 0.8;
     return Math.max(1, Math.floor(Math.random() * (max - min + 1)) + min);
   }
-
 }

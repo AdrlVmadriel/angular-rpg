@@ -1,7 +1,7 @@
 <div *ngFor="let current of [currentEntity$ | async]" fxLayout="column">
   <div fxLayout="row" fxLayoutAlign="space-between stretch">
-    <button md-icon-button (click)="previousCharacter()">
-      <md-icon>chevron_left</md-icon>
+    <button mat-icon-button (click)="previousCharacter()">
+      <mat-icon>chevron_left</mat-icon>
     </button>
 
     <section fxLayout="row" fxFlex fxLayoutAlign="space-around center">
@@ -17,8 +17,8 @@
       </div>
     </section>
 
-    <button md-icon-button (click)="nextCharacter()">
-      <md-icon>chevron_right</md-icon>
+    <button mat-icon-button (click)="nextCharacter()">
+      <mat-icon>chevron_right</mat-icon>
     </button>
   </div>
 

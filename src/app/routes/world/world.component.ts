@@ -8,25 +8,24 @@ import {
   ViewChild,
   HostListener
 } from '@angular/core';
-import {NotificationService} from '../../components/notification/notification.service';
-import {RPGGame} from '../../services/rpg-game';
-import {GameWorld} from '../../services/game-world';
-import {AppState} from '../../app.model';
-import {Store} from '@ngrx/store';
-import {GameResources} from '../../services/game-resources.service';
-import {PlayerBehaviorComponent} from './behaviors/player-behavior';
-import {Scene} from '../../../game/pow2/scene/scene';
-import {SceneView} from '../../../game/pow2/scene/scene-view';
-import {TileMap} from '../../../game/pow2/tile/tile-map';
-import {TileMapPathBehavior} from '../../../game/pow2/tile/behaviors/tile-map-path.behavior';
-import {PowInput, NamedMouseElement} from '../../../game/pow2/core/input';
-import {TileMapView} from '../../../game/pow2/tile/tile-map-view';
-import {LoadingService} from '../../components/loading/loading.service';
-import {PartyMenuComponent} from '../../components/party-menu/party-menu.component';
-import {WorldMapComponent} from './map/world-map.entity';
-import {GameFeatureObject} from '../../scene/game-feature-object';
-import {Rect} from '../../../game/pow-core/rect';
-import {Point} from '../../../game/pow-core/point';
+import { NotificationService } from '../../components/notification/notification.service';
+import { RPGGame } from '../../services/rpg-game';
+import { GameWorld } from '../../services/game-world';
+import { AppState } from '../../app.model';
+import { Store } from '@ngrx/store';
+import { PlayerBehaviorComponent } from './behaviors/player-behavior';
+import { Scene } from '../../../game/pow2/scene/scene';
+import { SceneView } from '../../../game/pow2/scene/scene-view';
+import { TileMap } from '../../../game/pow2/tile/tile-map';
+import { TileMapPathBehavior } from '../../../game/pow2/tile/behaviors/tile-map-path.behavior';
+import { PowInput, NamedMouseElement } from '../../../game/pow2/core/input';
+import { TileMapView } from '../../../game/pow2/tile/tile-map-view';
+import { LoadingService } from '../../components/loading/loading.service';
+import { PartyMenuComponent } from '../../components/party-menu/party-menu.component';
+import { WorldMapComponent } from './map/world-map.entity';
+import { GameFeatureObject } from '../../scene/game-feature-object';
+import { Rect } from '../../../game/pow-core/rect';
+import { Point } from '../../../game/pow-core/point';
 
 @Component({
   selector: 'world',
@@ -40,7 +39,8 @@ import {Point} from '../../../game/pow-core/point';
     '[style.color]': 'styleBackground'
   }
 })
-export class WorldComponent extends TileMapView implements AfterViewInit, OnDestroy {
+export class WorldComponent extends TileMapView
+  implements AfterViewInit, OnDestroy {
   @ViewChild('worldCanvas') canvasElementRef: ElementRef;
   @ViewChild(PartyMenuComponent) partyMenu: PartyMenuComponent;
 
@@ -58,13 +58,11 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
       // Escape out of any feature the player is currently in
       if (this.map.player && this.map.player.feature) {
         this.map.player.escapeFeature();
-      }
-      else if (this.partyMenu) {
+      } else if (this.partyMenu) {
         // Otherwise toggle the party menu
         this.partyMenu.open = !this.partyMenu.open;
       }
-    }
-    else if (event.key === '1') {
+    } else if (event.key === '1') {
       this.debug = !this.debug;
     }
   }
@@ -75,11 +73,13 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
   mouse: NamedMouseElement = null;
   scene: Scene = new Scene();
 
-  constructor(public game: RPGGame,
-              public notify: NotificationService,
-              public loadingService: LoadingService,
-              public store: Store<AppState>,
-              public world: GameWorld) {
+  constructor(
+    public game: RPGGame,
+    public notify: NotificationService,
+    public loadingService: LoadingService,
+    public store: Store<AppState>,
+    public world: GameWorld
+  ) {
     super();
     this.world.mark(this.scene);
     this.world.time.start();
@@ -102,7 +102,11 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
     // Camera (window bounds)
     if (this.map) {
       const tileOffset = this.map.bounds.getCenter();
-      const offset = this._bounds.clone().divide(2).multiply(-1).add(tileOffset);
+      const offset = this._bounds
+        .clone()
+        .divide(2)
+        .multiply(-1)
+        .add(tileOffset);
       this.camera.point.set(offset.floor());
     }
     this.camera.extent.set(this._bounds);
@@ -113,7 +117,7 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
   //
   onAddToScene(scene: Scene) {
     super.onAddToScene(scene);
-    this.mouse = this.world.input.mouseHook(<SceneView> this, 'world');
+    this.mouse = this.world.input.mouseHook(<SceneView>this, 'world');
 
     //
     // TODO: Consider how to remove these event listeners and replace with strongly typed observables
@@ -127,18 +131,24 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
   }
 
   public _onClick(e: MouseEvent) {
-
     // Ignore clicks that did not originate on the canvas
     if (e.srcElement !== this.canvas) {
       return;
     }
 
     // TODO: Skip this scene lookup and use the player component and its path behavior.
-    const pathComponent = this.scene.componentByType(TileMapPathBehavior) as TileMapPathBehavior;
-    const playerComponent = this.scene.componentByType(PlayerBehaviorComponent) as PlayerBehaviorComponent;
+    const pathComponent = this.scene.componentByType(
+      TileMapPathBehavior
+    ) as TileMapPathBehavior;
+    const playerComponent = this.scene.componentByType(
+      PlayerBehaviorComponent
+    ) as PlayerBehaviorComponent;
     if (pathComponent && playerComponent) {
       PowInput.mouseOnView(e, this.mouse.view, this.mouse);
-      playerComponent.path = pathComponent.calculatePath(playerComponent.targetPoint, this.mouse.world);
+      playerComponent.path = pathComponent.calculatePath(
+        playerComponent.targetPoint,
+        this.mouse.world
+      );
       e.preventDefault();
       return false;
     }
@@ -175,12 +185,21 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
       debugStrings.push(`Player: (${player.point.x},${player.point.y})`);
     }
     const clipRect = this.getCameraClip();
-    debugStrings.push(`Clip: (${clipRect.point.x},${clipRect.point.y}) (${clipRect.extent.x},${clipRect.extent.y})`);
+    debugStrings.push(
+      `Clip: (${clipRect.point.x},${clipRect.point.y}) (${clipRect.extent.x},${
+        clipRect.extent.y
+      })`
+    );
 
     // Render the clip rectangle
     this.context.strokeStyle = '#00ff00';
     const screenClip = this.worldToScreen(clipRect);
-    this.context.strokeRect(screenClip.point.x, screenClip.point.y, screenClip.extent.x, screenClip.extent.y);
+    this.context.strokeRect(
+      screenClip.point.x,
+      screenClip.point.y,
+      screenClip.extent.x,
+      screenClip.extent.y
+    );
 
     // Render impassable tiles on the map in the clip rect
     this.context.strokeStyle = '#ff0000';
@@ -190,11 +209,18 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
     const clipYMax = clipRect.getBottom();
     for (let x = clipXMin; x <= clipXMax; x++) {
       for (let y = clipYMin; y <= clipYMax; y++) {
-        this.map.getLayers().forEach((layer) => {
+        this.map.getLayers().forEach(layer => {
           const tile = this.map.getTerrain(layer.name, x, y);
           if (tile && !tile.passable) {
-            const screenTile: Rect = this.worldToScreen(new Rect(new Point(x - 0.5, y - 0.5), new Point(1, 1)));
-            this.context.strokeRect(screenTile.point.x, screenTile.point.y, screenTile.extent.x, screenTile.extent.y);
+            const screenTile: Rect = this.worldToScreen(
+              new Rect(new Point(x - 0.5, y - 0.5), new Point(1, 1))
+            );
+            this.context.strokeRect(
+              screenTile.point.x,
+              screenTile.point.y,
+              screenTile.extent.x,
+              screenTile.extent.y
+            );
           }
         });
       }
@@ -205,8 +231,15 @@ export class WorldComponent extends TileMapView implements AfterViewInit, OnDest
     const tiles = this.scene.objectsByType(GameFeatureObject);
     tiles.forEach((object: any) => {
       const point = object.renderPoint || object.point;
-      const screenTile: Rect = this.worldToScreen(new Rect(new Point(point.x - 0.5, point.y - 0.5), new Point(1, 1)));
-      this.context.strokeRect(screenTile.point.x, screenTile.point.y, screenTile.extent.x, screenTile.extent.y);
+      const screenTile: Rect = this.worldToScreen(
+        new Rect(new Point(point.x - 0.5, point.y - 0.5), new Point(1, 1))
+      );
+      this.context.strokeRect(
+        screenTile.point.x,
+        screenTile.point.y,
+        screenTile.extent.x,
+        screenTile.extent.y
+      );
     });
 
     // Framerate information

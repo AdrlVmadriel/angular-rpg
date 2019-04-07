@@ -1,29 +1,32 @@
-import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import {RouterModule} from '@angular/router';
-import {RouterStoreModule} from '@ngrx/router-store';
-import {StoreModule} from '@ngrx/store';
-import {CommonModule} from '@angular/common';
-import {BrowserModule} from '@angular/platform-browser';
-import {HttpModule} from '@angular/http';
-import {PowCoreModule} from '../game/pow-core/index';
-import {ROUTES} from './app.routes';
-import {rootReducer} from './models/index';
-import {CombatModule} from './routes/combat/index';
-import {GameStateEffects} from './models/game-state/game-state.effects';
-import {EffectsModule} from '@ngrx/effects';
-import {AppEffects} from './app.effects';
-import {WorldModule} from './routes/world';
-import {BehaviorsModule} from './behaviors/index';
-import {CombatEffects} from './models/combat/combat.effects';
-import {AppComponentsModule} from './components/index';
-import {GameDataEffects} from './models/game-data/game-data.effects';
-import {SpritesEffects} from './models/sprites/sprites.effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { StoreModule } from '@ngrx/store';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '@angular/http';
+import { PowCoreModule } from '../game/pow-core/index';
+import { ROUTES } from './app.routes';
+import { CombatModule } from './routes/combat/index';
+import { GameStateEffects } from './models/game-state/game-state.effects';
+import { EffectsModule } from '@ngrx/effects';
+import { AppEffects } from './app.effects';
+import { WorldModule } from './routes/world';
+import { BehaviorsModule } from './behaviors/index';
+import { CombatEffects } from './models/combat/combat.effects';
+import { AppComponentsModule } from './components/index';
+import { GameDataEffects } from './models/game-data/game-data.effects';
+import { SpritesEffects } from './models/sprites/sprites.effects';
+import { HttpClientModule } from '@angular/common/http';
+import { reducers } from './models';
+import { environment } from 'src/environments/environment';
 
 export const APP_IMPORTS = [
   BrowserModule,
   CommonModule,
   FormsModule,
-  HttpModule,
+  HttpClientModule,
 
   // Components
   BehaviorsModule.forRoot(),
@@ -35,9 +38,9 @@ export const APP_IMPORTS = [
   PowCoreModule.forRoot(),
 
   ReactiveFormsModule,
-  RouterModule.forRoot(ROUTES, {useHash: true}),
-  StoreModule.provideStore(rootReducer),
-  RouterStoreModule.connectRouter(),
+  StoreModule.forRoot(reducers),
+  RouterModule.forRoot(ROUTES, { useHash: true }),
+  StoreRouterConnectingModule.forRoot(),
 
   // TODO: store/devtools disabled because of poor performance.
   //
@@ -48,11 +51,16 @@ export const APP_IMPORTS = [
   // To re-enable the devtools, [fix this](https://github.com/ngrx/store-devtools/issues/57) and then pass
   // the option to use [Immutable compatible devtools](https://goo.gl/Wym3eT).
   //
-  // StoreDevtoolsModule.instrumentStore(),
+  StoreDevtoolsModule.instrument({
+    maxAge: 25,
+    logOnly: environment.production
+  }),
 
-  EffectsModule.run(GameStateEffects),
-  EffectsModule.run(CombatEffects),
-  EffectsModule.run(SpritesEffects),
-  EffectsModule.run(GameDataEffects),
-  EffectsModule.run(AppEffects)
+  EffectsModule.forRoot([
+    GameStateEffects,
+    CombatEffects,
+    SpritesEffects,
+    GameDataEffects,
+    AppEffects
+  ])
 ];
